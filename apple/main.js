@@ -2,11 +2,36 @@ enchant();
 window.onload = function () {
     
     var core = new Core(640,640);
-    core.preload("cat.png");
+    core.preload("cat.png","apple.png","meow.wav");
     core.fps = 30;
     core.onload = function () {
 
         const TIME = 10;
+        var score = 0;
+
+        var Apple = Class.create(Sprite,{
+            initialize: function(){
+                Sprite.call(this,100,100);
+                this.x = rand(640);
+                this.y = 0;
+                this.scaleX = 0.25;
+                this.scaleY = 0.25;
+                this.image = core.assets["apple.png"];
+                this.frame = 0;
+                this.on("enterframe",function(){
+                    this.y += 5;
+                    if(this.y >= 640){
+                        core.rootScene.removeChild(this);
+                    }
+                    if(this.within(cat,30)){
+                        core.assets["meow.wav"].clone().play();
+                        core.rootScene.removeChild(this);
+                        score++;
+                    }
+                });
+                core.rootScene.addChild(this);
+            }
+        });
 
         var cat = new Sprite(100,100);
         cat.image = core.assets["cat.png"];
@@ -39,7 +64,12 @@ window.onload = function () {
 
         core.rootScene.on("enterframe", function () {
             time.text = "Time: "+((((TIME * core.fps) - core.frame)) / core.fps).toFixed(0);
+
+            if (core.frame % 10 == 0){
+                var apple = new Apple();
+            }
             if(core.frame >= (core.fps * TIME)){
+                scoreLabel.text = "Score : "+score;
                 core.pushScene(gameOver);
                 core.stop();
             }
@@ -55,6 +85,18 @@ window.onload = function () {
         goLabel.font = "20px Hiragino";
         goLabel.color = "white";
         gameOver.addChild(goLabel);
+
+        var scoreLabel = new Label();
+        scoreLabel.x = 550;
+        scoreLabel.y = 10;
+        scoreLabel.text = "Score : 0";
+        scoreLabel.font = "20px Hiragino";
+        scoreLabel.color = "white";
+        gameOver.addChild(scoreLabel);
     }
     core.start();
+}
+
+function rand(n){
+    return Math.floor(Math.random() * (n + 1))
 }
