@@ -39,7 +39,22 @@ window.onload = function () {
 
         core.rootScene.on("enterframe", function () {
             time.text = "Time: "+((((TIME * core.fps) - core.frame)) / core.fps).toFixed(0);
-        })
+            if(core.frame >= (core.fps * TIME)){
+                core.pushScene(gameOver);
+                core.stop();
+            }
+        });
+
+        var gameOver = new Scene();
+        gameOver.backgroundColor = "black";
+
+        var goLabel = new Label();
+        goLabel.x = 280;
+        goLabel.y = 310;
+        goLabel.text = "Game Over";
+        goLabel.font = "20px Hiragino";
+        goLabel.color = "white";
+        gameOver.addChild(goLabel);
     }
     core.start();
 }
